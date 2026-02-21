@@ -23,8 +23,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
+  <BrowserRouter basename={import.meta.env.BASE_URL}>        <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/los/onboarding" element={<CustomerOnboarding />} />
           <Route path="/los/kyc" element={<KycVerification />} />
