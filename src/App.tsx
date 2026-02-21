@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import CustomerOnboarding from "./pages/los/CustomerOnboarding";
 import KycVerification from "./pages/los/KycVerification";
@@ -23,7 +23,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-  <Router basename={import.meta.env.BASE_URL}>        <Routes>
+  <BrowserRouter basename={import.meta.env.BASE_URL}>        <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/los/onboarding" element={<CustomerOnboarding />} />
           <Route path="/los/kyc" element={<KycVerification />} />
@@ -37,7 +37,7 @@ const App = () => (
           <Route path="/compliance" element={<Compliance />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-  </Router>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
