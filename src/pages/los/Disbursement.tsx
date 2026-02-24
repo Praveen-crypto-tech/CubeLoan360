@@ -2,6 +2,9 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Banknote, Building2, Calendar } from "lucide-react";
+import { api } from "@/lib/api";
+
+
 
 const emiSchedule = [
   { no: 1, date: "15 Mar 2026", emi: "₹16,735", principal: "₹11,527", interest: "₹5,208", balance: "₹4,88,473" },
@@ -52,9 +55,15 @@ export default function Disbursement() {
               <div className="border-t pt-2">
                 <div className="flex justify-between text-sm font-semibold"><span>Disbursement Amount</span><span className="text-primary">₹5,00,000</span></div>
               </div>
-              <Button className="mt-2 w-full"><Banknote className="mr-2 h-4 w-4" /> Confirm Disbursement</Button>
-            </CardContent>
-          </Card>
+              <Button
+        className="mt-2 w-full"
+        onClick={async () => {
+          const res = await api("/disbursement/confirm/1", { method: "POST" });
+          alert("Disbursed: " + res.account_number);
+        }}
+      ><Banknote className="mr-2 h-4 w-4" /> Confirm Disbursement</Button>
+                  </CardContent>
+                </Card>
 
           {/* Summary Card for Customer */}
           <Card className="card-shadow">

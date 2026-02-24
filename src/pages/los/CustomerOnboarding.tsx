@@ -13,6 +13,8 @@ const steps = [
   { label: "Confirmation", icon: CheckCircle2 },
 ];
 
+
+
 export default function CustomerOnboarding() {
   const [currentStep, setCurrentStep] = useState(0);
 

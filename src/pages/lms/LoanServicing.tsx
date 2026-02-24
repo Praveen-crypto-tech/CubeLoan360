@@ -1,11 +1,12 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
-  CreditCard, AlertTriangle, CheckCircle2, Clock, TrendingUp,
-  Calendar, IndianRupee, XCircle
+  CreditCard, CheckCircle2, Clock, TrendingUp,
+  IndianRupee, XCircle
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 
 const loanOverview = {
   totalLoans: 834,
@@ -39,20 +40,47 @@ const paymentHistory = [
 ];
 
 export default function LoanServicing() {
+
+  const [data, setData] = useState<any>(null);
+
+  useEffect(() => {
+    api("/servicing/dashboard")
+      .then(setData)
+      .catch(console.error);
+  }, []);
+
   return (
     <AppLayout>
       <div className="space-y-6">
+
         <div>
           <h1 className="font-heading text-2xl font-bold">Loan Servicing</h1>
-          <p className="text-sm text-muted-foreground">Post-disbursement loan management and tracking</p>
+          <p className="text-sm text-muted-foreground">
+            Post-disbursement loan management and tracking
+          </p>
         </div>
 
         {/* Overview Stats */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { label: "Active Loans", value: loanOverview.activeLoans, icon: CreditCard, color: "text-primary" },
-            { label: "Total Outstanding", value: loanOverview.totalOutstanding, icon: IndianRupee, color: "text-foreground" },
-            { label: "Collection Rate", value: loanOverview.collectionRate, icon: TrendingUp, color: "text-success" },
+            {
+              label: "Active Loans",
+              value: data?.active_loans ?? loanOverview.activeLoans,
+              icon: CreditCard,
+              color: "text-primary"
+            },
+            {
+              label: "Total Outstanding",
+              value: data?.total_outstanding ?? loanOverview.totalOutstanding,
+              icon: IndianRupee,
+              color: "text-foreground"
+            },
+            {
+              label: "Collection Rate",
+              value: data ? `${data.collection_rate}%` : loanOverview.collectionRate,
+              icon: TrendingUp,
+              color: "text-success"
+            },
           ].map((s) => (
             <Card key={s.label} className="card-shadow">
               <CardContent className="flex items-center gap-3 p-5">
@@ -69,32 +97,50 @@ export default function LoanServicing() {
         </div>
 
         <div className="grid gap-4 lg:grid-cols-2">
+
           {/* EMI Timeline */}
           <Card className="card-shadow">
             <CardHeader className="pb-3">
-              <CardTitle className="font-heading text-base">EMI Tracking Timeline</CardTitle>
+              <CardTitle className="font-heading text-base">
+                EMI Tracking Timeline
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {emiTimeline.map((e, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <div className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                      e.status === "paid" ? "bg-success/10" : e.status === "overdue" ? "bg-destructive/10" : "bg-muted"
+                      e.status === "paid"
+                        ? "bg-success/10"
+                        : e.status === "overdue"
+                        ? "bg-destructive/10"
+                        : "bg-muted"
                     }`}>
-                      {e.status === "paid" ? <CheckCircle2 className="h-4 w-4 text-success" /> :
-                       e.status === "overdue" ? <XCircle className="h-4 w-4 text-destructive" /> :
-                       <Clock className="h-4 w-4 text-muted-foreground" />}
+                      {e.status === "paid" ? (
+                        <CheckCircle2 className="h-4 w-4 text-success" />
+                      ) : e.status === "overdue" ? (
+                        <XCircle className="h-4 w-4 text-destructive" />
+                      ) : (
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                      )}
                     </div>
+
                     <div className="flex-1">
                       <p className="text-sm font-medium">{e.month}</p>
                       <p className="text-xs text-muted-foreground">{e.date}</p>
                     </div>
+
                     <span className="text-sm font-medium">{e.amount}</span>
+
                     <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${
-                      e.status === "paid" ? "bg-success/10 text-success" : 
-                      e.status === "overdue" ? "bg-destructive/10 text-destructive" : 
-                      "bg-muted text-muted-foreground"
-                    }`}>{e.status}</span>
+                      e.status === "paid"
+                        ? "bg-success/10 text-success"
+                        : e.status === "overdue"
+                        ? "bg-destructive/10 text-destructive"
+                        : "bg-muted text-muted-foreground"
+                    }`}>
+                      {e.status}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -103,13 +149,17 @@ export default function LoanServicing() {
 
           {/* Overdue Buckets + NPA */}
           <div className="space-y-4">
+
             <Card className="card-shadow">
               <CardHeader className="pb-3">
-                <CardTitle className="font-heading text-base">Overdue Buckets</CardTitle>
+                <CardTitle className="font-heading text-base">
+                  Overdue Buckets
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {overdueBuckets.map((b) => (
-                  <div key={b.bucket} className={`flex items-center justify-between rounded-lg border p-3 ${b.color}`}>
+                  <div key={b.bucket}
+                       className={`flex items-center justify-between rounded-lg border p-3 ${b.color}`}>
                     <div>
                       <p className="text-sm font-semibold">{b.bucket}</p>
                       <p className="text-xs opacity-70">{b.count} accounts</p>
@@ -122,23 +172,40 @@ export default function LoanServicing() {
 
             <Card className="card-shadow">
               <CardHeader className="pb-3">
-                <CardTitle className="font-heading text-base">NPA & Penal Interest</CardTitle>
+                <CardTitle className="font-heading text-base">
+                  NPA & Penal Interest
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">NPA Accounts</span><span className="font-bold text-destructive">8</span></div>
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Total Penal Interest</span><span className="font-medium">₹2.4 L</span></div>
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Legal Tagged</span><span className="font-medium text-destructive">3 accounts</span></div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">NPA Accounts</span>
+                  <span className="font-bold text-destructive">8</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total Penal Interest</span>
+                  <span className="font-medium">₹2.4 L</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Legal Tagged</span>
+                  <span className="font-medium text-destructive">3 accounts</span>
+                </div>
+
                 <Progress value={8 / 756 * 100} className="mt-2 h-1.5" />
-                <p className="text-[10px] text-muted-foreground">NPA ratio: 1.06%</p>
+                <p className="text-[10px] text-muted-foreground">
+                  NPA ratio: 1.06%
+                </p>
               </CardContent>
             </Card>
+
           </div>
         </div>
 
         {/* Payment History */}
         <Card className="card-shadow">
           <CardHeader className="pb-3">
-            <CardTitle className="font-heading text-base">Recent Payment Postings</CardTitle>
+            <CardTitle className="font-heading text-base">
+              Recent Payment Postings
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -159,7 +226,11 @@ export default function LoanServicing() {
                       <td className="py-2.5">{p.date}</td>
                       <td className="py-2.5 font-medium">{p.amount}</td>
                       <td className="py-2.5 text-muted-foreground">{p.mode}</td>
-                      <td className="py-2.5"><span className="rounded-full bg-success/10 px-2 py-0.5 text-[11px] font-medium text-success">{p.status}</span></td>
+                      <td className="py-2.5">
+                        <span className="rounded-full bg-success/10 px-2 py-0.5 text-[11px] font-medium text-success">
+                          {p.status}
+                        </span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -167,6 +238,7 @@ export default function LoanServicing() {
             </div>
           </CardContent>
         </Card>
+
       </div>
     </AppLayout>
   );

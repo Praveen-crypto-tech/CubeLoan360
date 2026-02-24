@@ -5,6 +5,8 @@ import {
   AlertTriangle, Phone, Mail, Scale, Clock, Bell, FileText,
   MessageSquare, ChevronRight, Users
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 
 const timeline = [
   { day: "Day 1", action: "SMS + Push Notification", icon: Bell, status: "sent", detail: "EMI reminder sent via SMS & app notification" },
@@ -20,6 +22,14 @@ const collections = [
   { name: "Deepak Joshi", loanId: "CL-2024-0987", dpd: 78, amount: "₹50,205", bucket: "DPD 60+", officer: "Pradeep S.", status: "Legal" },
   { name: "Kavita Nair", loanId: "CL-2024-1156", dpd: 12, amount: "₹16,735", bucket: "DPD 1–30", officer: "Ravi K.", status: "Promise to Pay" },
 ];
+
+const [board, setBoard] = useState([]);
+const [escalation, setEscalation] = useState([]);
+
+useEffect(() => {
+  api("/recovery/board").then(setBoard);
+  api("/recovery/escalation").then(setEscalation);
+}, []);
 
 const bucketColors: Record<string, string> = {
   "DPD 1–30": "bg-warning/10 text-warning border-warning/20",
